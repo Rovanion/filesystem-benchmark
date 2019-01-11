@@ -41,16 +41,21 @@
     (do (doall (map deref future-files))
         (str base-path "mmap-chunked-" nr-chunks))))
 
+(defn +throughput
+  [time-dict size]
+  (assoc time-dict :throughput-MBps (/ (/ size (math/expt 2 20))
+                                       (/ (:execution-time-ms time-dict) 1000))))
 
-(for [exponent (range 25 32)]
-  (let [size (math/expt 2 exponent)
-        data (byte-array size)
-        folder "./out/"]
-    [(str "Size: " size "b, " (/ size (math/expt 2 10)) "kB, " (/ size (math/expt 2 20)) "MB")
-     (time (write-file-mmap data folder))
-     ; (time (write-file-output-stream data folder))
-     (for [nr-chunks '(2 4 8 16 32 64)]
-              (time (write-file-chunked-mmap data folder nr-chunks)))]))
+(defn run-write-type-benchmark
+  [folder]
+  (for [exponent (range 24 31)]
+    (let [size   (math/expt 2 exponent)
+          data   (byte-array size)]
+      [(str "Size: " size "b, " (/ size (math/expt 2 10)) "kB, " (/ size (math/expt 2 20)) "MB")
+       (+throughput (time (write-file-mmap           data folder)) size)
+       (+throughput (time (write-file-output-stream  data folder)) size)
+       (doall (for [nr-chunks '(2 4 8 16 32 64)]
+                (+throughput (time (write-file-chunked-mmap data folder nr-chunks)) size)))])))
 
 (defn run-benchmark
   "The meat of the code."
