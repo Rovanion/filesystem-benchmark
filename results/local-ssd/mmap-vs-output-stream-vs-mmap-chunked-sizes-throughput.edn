@@ -1,0 +1,63 @@
+(["Size: 16777216b, 16384kB, 16MB"
+  {:retval "./out/mmap",             :execution-time-ms 6.553556,    :throughput-bps 2.560017187615395E9}
+  {:retval "./out/output-stream",    :execution-time-ms 115.839604,  :throughput-bps 1.4483143433397788E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 15.759266,   :throughput-bps 1.0645937444040858E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 8.243237,    :throughput-bps 2.0352703676965735E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 14.588147,   :throughput-bps 1.1500580574078395E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 8.276171,    :throughput-bps 2.02717126071948E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 8.65697,     :throughput-bps 1.9380009402828012E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 14.049788,   :throughput-bps 1.19412591848361E9})]
+ ["Size: 33554432b, 32768kB, 32MB"
+  {:retval "./out/mmap",             :execution-time-ms 15.463369,   :throughput-bps 2.169930239652174E9}
+  {:retval "./out/output-stream",    :execution-time-ms 40.454071,   :throughput-bps 8.294451255597984E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 22.362771,   :throughput-bps 1.5004594913573098E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 12.788121,   :throughput-bps 2.623875079067519E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 11.124401,   :throughput-bps 3.016291124349077E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 12.617256,   :throughput-bps 2.6594080361054735E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 11.416665,   :throughput-bps 2.939074764828433E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 11.805407,   :throughput-bps 2.8422935354960656E9})]
+ ["Size: 67108864b, 65536kB, 64MB"
+  {:retval "./out/mmap",             :execution-time-ms 30.614316,   :throughput-bps 2.192074583668634E9}
+  {:retval "./out/output-stream",    :execution-time-ms 76.037092,   :throughput-bps 8.825806226255996E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 25.648888,   :throughput-bps 2.616443410724083E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 26.854798,   :throughput-bps 2.4989524776913238E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 20.881608,   :throughput-bps 3.2137785557510705E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 14.177794,   :throughput-bps 4.733378408516868E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 14.582113,   :throughput-bps 4.60213578100787E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 14.965223,   :throughput-bps 4.484321015463652E9})]
+ ["Size: 134217728b, 131072kB, 128MB"
+  {:retval "./out/mmap",             :execution-time-ms 66.320831,   :throughput-bps 2.0237642679718535E9}
+  {:retval "./out/output-stream",    :execution-time-ms 168.403452,  :throughput-bps 7.970010495984371E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 45.518471,   :throughput-bps 2.9486431563134007E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 39.678399,   :throughput-bps 3.3826397078168406E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 21.314734,   :throughput-bps 6.2969459529731865E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 26.61023,    :throughput-bps 5.043839455728116E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 25.019876,   :throughput-bps 5.36444417230525E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 23.128342,   :throughput-bps 5.803171191432572E9})]
+ ["Size: 268435456b, 262144kB, 256MB"
+  {:retval "./out/mmap",             :execution-time-ms 137.75258,   :throughput-bps 1.9486782461715057E9}
+  {:retval "./out/output-stream",    :execution-time-ms 404.046621,  :throughput-bps 6.643675309934098E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 63.590179,   :throughput-bps 4.2213351215759277E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 57.142491,   :throughput-bps 4.697650580196093E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 48.137734,   :throughput-bps 5.576404074192607E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 136.262106,  :throughput-bps 1.9699934477748349E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 162.832502,  :throughput-bps 1.6485373171997318E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 217.993185,  :throughput-bps 1.2313937979299674E9})]
+ ["Size: 536870912b, 524288kB, 512MB"
+  {:retval "./out/mmap",             :execution-time-ms 489.065637,  :throughput-bps 1.0977481781244018E9}
+  {:retval "./out/output-stream",    :execution-time-ms 928.999871,  :throughput-bps 5.779020307312831E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 385.235833,  :throughput-bps 1.3936162371479082E9}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 387.736997,  :throughput-bps 1.3846264765907805E9}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 392.367923,  :throughput-bps 1.3682844099363341E9}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 380.017023,  :throughput-bps 1.4127549017718608E9}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 484.220561,  :throughput-bps 1.108732167199319E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 557.768837,  :throughput-bps 9.625330000284687E8})]
+ ["Size: 1073741824b, 1048576kB, 1024MB"
+  {:retval "./out/mmap",             :execution-time-ms 446.361853,  :throughput-bps 2.4055411921591787E9}
+  {:retval "./out/output-stream",    :execution-time-ms 4160.075855, :throughput-bps 2.5810630897738764E8}
+  ({:retval "./out/mmap-chunked-2",  :execution-time-ms 1409.264587, :throughput-bps 7.619164164805627E8}
+   {:retval "./out/mmap-chunked-4",  :execution-time-ms 1129.811545, :throughput-bps 9.503725012829463E8}
+   {:retval "./out/mmap-chunked-8",  :execution-time-ms 1113.210995, :throughput-bps 9.645447528121117E8}
+   {:retval "./out/mmap-chunked-16", :execution-time-ms 1150.883232, :throughput-bps 9.329719941562239E8}
+   {:retval "./out/mmap-chunked-32", :execution-time-ms 746.476778,  :throughput-bps 1.4384128959467778E9}
+   {:retval "./out/mmap-chunked-64", :execution-time-ms 1203.006201, :throughput-bps 8.925488689147663E8})])
