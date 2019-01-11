@@ -1,4 +1,4 @@
-(ns disk-benchmark.utilities)
+(ns filesystem-benchmark.utilities)
 
 (defmacro time
   "Evaluates expr and returns a map with the return value and time

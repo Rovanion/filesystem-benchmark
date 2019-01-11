@@ -1,4 +1,4 @@
-(ns disk-benchmark.arguments
+(ns filesystem-benchmark.arguments
   (:require [clojure.java.io   :as io]
             [clojure.tools.cli :as cli]))
 
@@ -24,6 +24,6 @@
   (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)]
     (cond
       (:help options) {:exit-message summary :ok? true}  ; help => exit 0 with usage summary.
-      errors          {:exit-message (error-msg errors)} ; errors => exit 1 with description of errors.
+      errors          {:exit-message errors}             ; errors => exit 1 with description of errors.
       arguments       {:exit-message "This program takes no arguments."}
-      :else           {:options options})))
+      :else           {:options      options})))
