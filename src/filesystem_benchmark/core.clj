@@ -1,10 +1,10 @@
 (ns filesystem-benchmark.core
   (:require [clojure.java.io                :as io]
+            [clojure.java.shell             :refer [sh]]
             [clojure.math.numeric-tower     :as math]
             [clj-mmap.core                  :as mmap]
             [filesystem-benchmark.arguments :refer [validate-args]]
-            [filesystem-benchmark.utilities :refer [time]]
-            [java.nio.Buffer :as buffer])
+            [filesystem-benchmark.utilities :refer [time-dict now]])
   (:gen-class))
 
 
@@ -41,6 +41,16 @@
     (do (doall (map deref future-files))
         (str base-path "mmap-chunked-" nr-chunks))))
 
+(defn write-file-copies-mmap
+  "Write nr-copies of bytes in base-path."
+  [bytes base-path nr-copies]
+  (let [future-files (for [i (range nr-copies)]
+                       (future (let [path (str base-path "mmap-copies-" i)]
+                                 (with-open [mapped-file (mmap/get-mmap path :read-write (count bytes))]
+                                   (mmap/put-bytes mapped-file bytes 0)))))]
+    (do (doall (map deref future-files))
+        (str base-path "mmap-copies-" nr-copies))))
+
 (defn +throughput
   [time-dict size]
   (assoc time-dict :throughput-MBps (/ (/ size (math/expt 2 20))
@@ -52,15 +62,63 @@
     (let [size   (math/expt 2 exponent)
           data   (byte-array size)]
       [(str "Size: " size "b, " (/ size (math/expt 2 10)) "kB, " (/ size (math/expt 2 20)) "MB")
-       (+throughput (time (write-file-mmap           data folder)) size)
-       (+throughput (time (write-file-output-stream  data folder)) size)
+       (+throughput (time-dict (write-file-mmap           data folder)) size)
+       (+throughput (time-dict (write-file-output-stream  data folder)) size)
        (doall (for [nr-chunks '(2 4 8 16 32 64)]
-                (+throughput (time (write-file-chunked-mmap data folder nr-chunks)) size)))])))
+                (+throughput (time-dict (write-file-chunked-mmap data folder nr-chunks)) size)))])))
+
+(defn run-write-throughput-benchmark
+  "Runs a write throughput benchmark with a default file size of 32MB."
+  ([folder] (run-read-throughput-benchmark folder (math/expt 2 25)))
+  ([folder file-size]
+   (let [data (byte-array file-size)]
+     (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 12))]
+       (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
+           (+throughput (* file-size nr-concurrent-files))
+           (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
+
+(def path "./out/")
+
+(defn read-file-mmap
+  [path & [size]]
+  (with-open [mmapped-file (mmap/get-mmap path :read-only)]
+             (mmap/get-bytes mmapped-file 0 (or size (.size mmapped-file)))))
+
+(time-dict (read-file-mmap (str path "mmap-copies-1") (math/expt 2 23)))
+
+(defn read-file-copies-mmap
+  "This function assumes that there in folder is nr-files to read
+  named mmap-copies-N."
+  [folder nr-files & [size]]
+  (let [future-files (for [i (range nr-files)]
+                     (future (let [path (str folder "mmap-copies-" i)]
+                               (read-file-mmap path size)
+                               "Dummy retval to not blow the heap")))]
+    (do (doall (map deref future-files))
+        (str "read-mmap-" nr-files))))
+
+(time-dict (read-file-copies-mmap folder 128 (math/expt 2 25)))
+
+(defn run-read-throughput-benchmark
+  "Runs a read throughput benchmark with a default file size of 32MB."
+  ([folder] (run-read-throughput-benchmark folder (math/expt 2 25)))
+  ([folder file-size]
+   (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 12))]
+     (-> (time-dict (read-file-copies-mmap folder nr-concurrent-files file-size))
+         (+throughput (* file-size nr-concurrent-files))
+         (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files))))))
 
 (defn run-benchmark
-  "The meat of the code."
-  [{:keys path}]
-  (time (write-file (byte-array (math/expt 2 20)) path)))
+  [{:keys [path]}]
+  (spit (str path "write-type-output-" (now) ".edn")
+        (prn-str (run-write-type-benchmark path)))
+  (spit (str path "write-throughput-"  (now) ".edn")
+        (prn-str (run-write-throughput-benchmark path)))
+  (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3")
+  (spit (str path "read-throughput-"   (now) ".edn")
+        (prn-str (run-read-throughput-benchmark path (math/expt 2 22))))
+  (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3"))
+
 
 
 (defn -main
@@ -68,5 +126,6 @@
   [& args]
   (let [{:keys [arguments options exit-message ok?]} (validate-args args)]
     (if exit-message
-      (exit (if ok? 0 1) exit-message)
+      (do (println exit-message)
+          (System/exit (if ok? 0 1)))
       (run-benchmark options))))
