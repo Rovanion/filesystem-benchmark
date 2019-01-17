@@ -97,8 +97,6 @@
     (do (doall (map deref future-files))
         (str "read-mmap-" nr-files))))
 
-(time-dict (read-file-copies-mmap folder 128 (math/expt 2 25)))
-
 (defn run-read-throughput-benchmark
   "Runs a read throughput benchmark with a default file size of 32MB."
   ([folder] (run-read-throughput-benchmark folder (math/expt 2 25)))
