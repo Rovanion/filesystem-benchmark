@@ -77,14 +77,12 @@
            (+throughput (* file-size nr-concurrent-files))
            (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
 
-(def path "./out/")
 
 (defn read-file-mmap
   [path & [size]]
   (with-open [mmapped-file (mmap/get-mmap path :read-only)]
              (mmap/get-bytes mmapped-file 0 (or size (.size mmapped-file)))))
 
-(time-dict (read-file-mmap (str path "mmap-copies-1") (math/expt 2 23)))
 
 (defn read-file-copies-mmap
   "This function assumes that there in folder is nr-files to read
@@ -116,7 +114,6 @@
   (spit (str path "read-throughput-"   (now) ".edn")
         (prn-str (run-read-throughput-benchmark path (math/expt 2 22))))
   (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3"))
-
 
 
 (defn -main
