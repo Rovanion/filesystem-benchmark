@@ -69,7 +69,7 @@
 
 (defn run-write-throughput-benchmark
   "Runs a write throughput benchmark with a default file size of 32MB."
-  ([folder] (run-read-throughput-benchmark folder (math/expt 2 25)))
+  ([folder] (run-write-throughput-benchmark folder (math/expt 2 25)))
   ([folder file-size]
    (let [data (byte-array file-size)]
      (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 12))]
