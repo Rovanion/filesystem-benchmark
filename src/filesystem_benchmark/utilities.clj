@@ -16,7 +16,17 @@
   []
   (java.time.LocalDateTime/now))
 
-(defn pp
+(defn ppw
+  "Pretty print with a large column width."
   [& args]
-  (binding [clojure.pprint/*print-right-margin* 120]
-    (clojure.pprint/pprint args)))
+  (binding [clojure.pprint/*print-right-margin* 150]
+    (apply clojure.pprint/pprint args)))
+
+(defn pps
+  "Pretty print with a large column width to a string."
+  [& args]
+  (with-out-str (apply ppw args)))
+
+
+(defn log2 [n]
+  (/ (Math/log n) (Math/log 2)))
