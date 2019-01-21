@@ -1,6 +1,6 @@
 # filesystem-benchmark
 
-FIXME: description
+May or may not benchmark the file system.
 
 ## Installation
 
@@ -8,9 +8,12 @@ Download from http://example.com/FIXME.
 
 ## Usage
 
-FIXME: explanation
+You will need to add the following to `/etc/sudoers` through `visudo`:
 
-    $ java -jar filesystem-benchmark-0.1.0-standalone.jar [args]
+```
+<your username here>   ALL = NOPASSWD: /sbin/sysctl vm.drop_caches=3
+```
+
 
 ## Options
 
