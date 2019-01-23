@@ -4,7 +4,7 @@
             [clojure.math.numeric-tower     :as math]
             [clj-mmap.core                  :as mmap]
             [filesystem-benchmark.arguments :refer [validate-args]]
-            [filesystem-benchmark.utilities :refer [time-dict now pps log2]])
+            [filesystem-benchmark.utilities :refer [time-dict now pps log2 pooled-future]])
   (:gen-class))
 
 
@@ -35,9 +35,10 @@
   [bytes base-path nr-chunks]
   (let [chunk-size   (/ (count bytes) nr-chunks)
         future-files (for [i (range nr-chunks)]
-                       (future (let [path (str base-path "mmap-chunked-" i)]
-                                 (with-open [mapped-file (mmap/get-mmap path :read-write chunk-size)]
-                                   (mmap/put-bytes mapped-file bytes 0 chunk-size)))))]
+                       (pooled-future
+                        (let [path (str base-path "mmap-chunked-" i)]
+                          (with-open [mapped-file (mmap/get-mmap path :read-write chunk-size)]
+                            (mmap/put-bytes mapped-file bytes 0 chunk-size)))))]
     (do (doall (map deref (doall future-files)))
         (str "mmap-write-chunked-" nr-chunks))))
 
@@ -45,9 +46,10 @@
   "Write nr-copies of bytes in base-path."
   [bytes base-path nr-copies]
   (let [future-files (for [i (range nr-copies)]
-                       (future (let [path (str base-path "mmap-copies-" i)]
-                                 (with-open [mapped-file (mmap/get-mmap path :read-write (count bytes))]
-                                   (mmap/put-bytes mapped-file bytes 0)))))]
+                       (pooled-future
+                        (let [path (str base-path "mmap-copies-" i)]
+                          (with-open [mapped-file (mmap/get-mmap path :read-write (count bytes))]
+                            (mmap/put-bytes mapped-file bytes 0)))))]
     ;; Dereference all future files, that is wait until all futures have produced a value.
     (do (doall (map deref
                     ;; But make sure to create all futures before we start dereferencing.
@@ -78,6 +80,7 @@
   ([folder file-size] (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
   ([folder file-size max-copies]
    (let [data (byte-array file-size)]
+     (println "write wat?")
      (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc max-copies))))]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
            (+throughput (* file-size nr-concurrent-files))
@@ -94,9 +97,10 @@
   named mmap-copies-N."
   [folder nr-files & [size]]
   (let [future-files (for [i (range nr-files)]
-                       (future (let [path (str folder "mmap-copies-" i)]
-                                 (read-file-mmap path size)
-                                        "Dummy retval to not blow the heap")))]
+                       (pooled-future
+                        (let [path (str folder "mmap-copies-" i)]
+                          (read-file-mmap path size)
+                          "Dummy retval to not blow the heap")))]
     (do (doall (map deref (doall future-files)))
         (str "read-mmap-" nr-files))))
 
@@ -118,11 +122,16 @@
 
 (defn run-benchmark
   [{:keys [path file-size max-copies]}]
-  (let [file-size-mb (/ file-size (math/expt 2 20))
-        out (partial -bench-out path file-size-mb max-copies)]
-    (out "write-type-output-" (run-write-type-benchmark!       path file-size))
-    (out "write-throughput-"  (run-write-throughput-benchmark! path file-size max-copies))
-    (out "read-throughput-"   (run-read-throughput-benchmark!  path file-size max-copies))))
+  (let [file-size-mb    (/ file-size (math/expt 2 20))
+        out             (partial -bench-out path file-size-mb max-copies)
+        data-files-path (str path "/data-files/")]
+    (io/make-parents (str data-files-path "dummy"))
+    (println "Starting write type benchmark.")
+    (out "write-type-output-" (run-write-type-benchmark!       data-files-path file-size))
+    (println "Starting write throughput benchmark.")
+    (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size max-copies))
+    (println "Starting read throughput benchmark.")
+    (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size max-copies))))
 
 
 (defn -main
