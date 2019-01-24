@@ -1,5 +1,6 @@
 (ns filesystem-benchmark.result-parsing
-  (:require [clojure.edn :refer [read-string]]))
+  (:require [clojure.edn :refer [read-string]])
+  (:refer-clojure :exclude [future-call]))
 
 (def first-pooled-1MB (read-string (slurp "/mnt/DL_cluster_storage/benchmark/pooled-read-throughput-1MB-8192copies-2019-01-23T13:18:26.067.edn")))
 (def second-pooled-1MB (read-string (slurp "/mnt/DL_cluster_storage/benchmark/pooled-read-throughput-1MB-8192copies-2019-01-23T13:58:19.062.edn")))

@@ -1,4 +1,5 @@
-(ns filesystem-benchmark.utilities)
+(ns filesystem-benchmark.utilities
+  (:refer-clojure :exclude [future-call]))
 
 (defmacro time-dict
   "Evaluates expr and returns a map with the return value and time
