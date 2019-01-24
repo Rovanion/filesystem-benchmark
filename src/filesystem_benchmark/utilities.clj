@@ -99,3 +99,8 @@
   deref with timeout is used. See also - realized?."
   {:added "1.1"}
   [& body] `(future-call (^{:once true} fn* [] ~@body)))
+
+(defn tprn
+  [retvals]
+  (prn retvals)
+  retvals)
