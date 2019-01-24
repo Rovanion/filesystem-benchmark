@@ -48,5 +48,3 @@
       errors          {:exit-message errors}             ; errors => exit 1 with description of errors.
       (not (empty arguments)) {:exit-message "This program takes no positional arguments."}
       :else           {:options      options})))
-
-(cli/parse-opts nil cli-options)

@@ -80,7 +80,6 @@
   ([folder file-size] (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
   ([folder file-size max-copies]
    (let [data (byte-array file-size)]
-     (println "write wat?")
      (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc max-copies))))]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
            (+throughput (* file-size nr-concurrent-files))
