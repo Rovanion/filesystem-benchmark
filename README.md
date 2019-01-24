@@ -1,6 +1,10 @@
 # filesystem-benchmark
 
-May or may not benchmark the file system.
+May or may not benchmark a file system. Things it might be
+benchmarking instead includes:
+
+* The kernel's ability to schedule threads.
+* Java's file IO primitives in java.nio.
 
 ## Installation
 
