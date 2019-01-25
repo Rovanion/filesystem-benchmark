@@ -4,7 +4,7 @@
             [clojure.math.numeric-tower     :as math]
             [clj-mmap.core                  :as mmap]
             [filesystem-benchmark.arguments :refer [validate-args]]
-            [filesystem-benchmark.utilities :refer [time-dict now pps log2 pooled-future]])
+            [filesystem-benchmark.utilities :refer [time-dict now pps log2 pooled-future in?]])
   (:gen-class))
 
 
@@ -120,17 +120,20 @@
   (spit (str path name file-size-mb "MB-" max-copies "copies-" (now) ".edn") (pps data)))
 
 (defn run-benchmark
-  [{:keys [path file-size max-copies]}]
+  [{:keys [path file-size max-copies benchmarks]}]
   (let [file-size-mb    (/ file-size (math/expt 2 20))
         out             (partial -bench-out path file-size-mb max-copies)
         data-files-path (str path "/data-files/")]
     (io/make-parents (str data-files-path "dummy"))
-    (println "Starting write type benchmark.")
-    (out "write-type-output-" (run-write-type-benchmark!       data-files-path file-size))
-    (println "Starting write throughput benchmark.")
-    (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size max-copies))
-    (println "Starting read throughput benchmark.")
-    (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size max-copies))))
+    (when (in? benchmarks :write-type)
+      (println "Starting write type benchmark.")
+      (out "write-type-output-" (run-write-type-benchmark!       data-files-path file-size)))
+    (when (in? benchmarks :write-throughput)
+      (println "Starting write throughput benchmark.")
+      (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size max-copies)))
+    (when (in? benchmarks :read-throughput)
+      (println "Starting read throughput benchmark.")
+      (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size max-copies)))))
 
 
 (defn -main
