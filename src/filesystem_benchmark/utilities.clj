@@ -32,6 +32,10 @@
 (defn log2 [n]
   (/ (Math/log n) (Math/log 2)))
 
+(defn in?
+  [coll x]
+  (if (some #{x} coll) true false))
+
 ;;; Reimplement future in order to use a different executor.
 
 (defn binding-conveyor-fn
