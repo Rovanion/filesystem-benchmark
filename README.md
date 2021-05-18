@@ -8,7 +8,13 @@ benchmarking instead includes:
 
 ## Installation
 
-Download from http://example.com/FIXME.
+Clone the source code from https://github.com/Rovanion/filesystem-benchmark, then compile a standalone jar-file using leiningen:
+
+```
+lein uberjar
+```
+
+You will now find a file named `target/uberjar/filesystem-benchmark-<VERSION>-standalone.jar` on your system ready for usage.
 
 ## Usage
 
@@ -18,22 +24,27 @@ You will need to add the following to `/etc/sudoers` through `visudo`:
 <your username here>   ALL = NOPASSWD: /sbin/sysctl vm.drop_caches=3
 ```
 
+Then run the uberjar with Java 8 or above:
+
+```
+java -jar target/uberjar/filesystem-benchmark-<VERSION>-standalone.jar --help
+```
 
 ## Options
 
-FIXME: listing of options this app accepts.
+```
+  -p, --path PATH                                                 Path to the file system being tested.
+  -s, --file-size NUM_BYTES                                       Size of the files to be generated in bytes.
+  -c, --concurrency NUM_FILES                                     The number of files to write concurrently.
+  -b, --benchmarks (read-throughput|write-throughput|write-type)  Which of the available benchmarks to run. Separate by comma if multiple.
+```
 
 ## Examples
 
-...
+```
+java -jar target/uberjar/filesystem-benchmark-<VERSION>-standalone.jar --path .
+```
 
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
 
 ## License
 
