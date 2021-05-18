@@ -78,9 +78,10 @@
   32MB and default max copies of 1024."
   ([folder]           (run-write-throughput-benchmark! folder (math/expt 2 25)))
   ([folder file-size] (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
-  ([folder file-size max-copies]
+  ([folder file-size concurrency]
+   (println folder file-size concurrency)
    (let [data (byte-array file-size)]
-     (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc max-copies))))]
+     (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc concurrency))))]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
            (+throughput (* file-size nr-concurrent-files))
            (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
@@ -108,21 +109,21 @@
   and default max copies of 1024."
   ([folder]           (run-read-throughput-benchmark! folder (math/expt 2 25)))
   ([folder file-size] (run-read-throughput-benchmark! folder file-size (math/expt 2 10)))
-  ([folder file-size max-copies]
-   (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc max-copies))))]
+  ([folder file-size concurrency]
+   (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc concurrency))))]
      (do (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3")
          (-> (time-dict (read-file-copies-mmap folder nr-concurrent-files file-size))
              (+throughput (* file-size nr-concurrent-files))
              (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
 
 (defn -bench-out
-  [path file-size-mb max-copies name data]
-  (spit (str path name file-size-mb "MB-" max-copies "copies-" (now) ".edn") (pps data)))
+  [path file-size-mb concurrency name data]
+  (spit (str path name file-size-mb "MB-" concurrency "copies-" (now) ".edn") (pps data)))
 
 (defn run-benchmark
-  [{:keys [path file-size max-copies benchmarks]}]
+  [{:keys [path file-size concurrency benchmarks]}]
   (let [file-size-mb    (/ file-size (math/expt 2 20))
-        out             (partial -bench-out path file-size-mb max-copies)
+        out             (partial -bench-out path file-size-mb concurrency)
         data-files-path (str path "/data-files/")]
     (io/make-parents (str data-files-path "dummy"))
     (when (in? benchmarks :write-type)
@@ -130,10 +131,10 @@
       (out "write-type-output-" (run-write-type-benchmark!       data-files-path file-size)))
     (when (in? benchmarks :write-throughput)
       (println "Starting write throughput benchmark.")
-      (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size max-copies)))
+      (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size concurrency)))
     (when (in? benchmarks :read-throughput)
       (println "Starting read throughput benchmark.")
-      (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size max-copies)))))
+      (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size concurrency)))))
 
 
 (defn -main
@@ -144,3 +145,9 @@
       (do (println exit-message)
           (System/exit (if ok? 0 1)))
       (run-benchmark options))))
+
+
+(comment
+  (validate-args ["."])
+  (-main ".")
+  )
