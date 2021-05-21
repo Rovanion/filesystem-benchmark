@@ -147,6 +147,5 @@
 
 
 (comment
-  (validate-args ["."])
-  (-main ".")
+  (-main "--path" "/mnt/machine-learning-storage/ML1/Maintenance/filesystem-benchmark/se03-dgx09/")
   )
