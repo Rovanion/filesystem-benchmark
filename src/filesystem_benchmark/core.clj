@@ -28,10 +28,10 @@
 (defn write-file-chunked-mmap
   "Write bytes to nr-chunks number of files in base-path.
 
-  Note though that this function doesn't work properly, it writes
-  the first part of the byte-array to all chunks, but it was only
-  meant for benchmarking and thus the time to make it work for
-  real wasn't taken."
+  Note though that this function doesn't work properly, it writes the
+  first part of the byte-array to all chunks, but it was only meant
+  for benchmarking and thus the time to make it work for real wasn't
+  taken."
   [bytes base-path nr-chunks]
   (let [chunk-size   (/ (count bytes) nr-chunks)
         future-files (for [i (range nr-chunks)]
