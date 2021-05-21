@@ -79,7 +79,6 @@
   ([folder]           (run-write-throughput-benchmark! folder (math/expt 2 25)))
   ([folder file-size] (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
   ([folder file-size concurrency]
-   (println folder file-size concurrency)
    (let [data (byte-array file-size)]
      (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc concurrency))))]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
