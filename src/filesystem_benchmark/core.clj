@@ -117,7 +117,7 @@
 
 (defn -bench-out
   [path file-size-mb concurrency name data]
-  (spit (str path name file-size-mb "MB-" concurrency "copies-" (now) ".edn") (pps data)))
+  (spit (str path "/" name file-size-mb "MB-" concurrency "copies-" (now) ".edn") (pps data)))
 
 (defn run-benchmark
   [{:keys [path file-size concurrency benchmarks]}]
