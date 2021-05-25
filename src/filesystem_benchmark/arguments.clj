@@ -5,6 +5,11 @@
             [clojure.string             :as string]
             [filesystem-benchmark.utilities :refer [tprn]]))
 
+(defn parse-int
+  "Takes a string and tries to parse it as an integer."
+  [number-string]
+  (Integer/parseInt number-string))
+
 (def cli-options
   ;; An option with a required argument
   [["-p" "--path PATH" "Path to the file system being tested."
@@ -14,12 +19,16 @@
                #(.isDirectory %) "Path must be a directory."]]
    ["-s" "--file-size NUM_BYTES" "Size of the files to be generated in bytes."
     :default  (math/expt 2 22)
-    :parse-fn (biginteger "1")
+    :parse-fn parse-int
     :validate [#(> % 0)          "Size must be a positive integer."]]
-   ["-c" "--concurrency NUM_FILES" "The number of files to write concurrently."
+   ["-m" "--max-files NUM_FILES" "The largest number of files to write concurrently."
     :default  (math/expt 2 10)
-    :parse-fn (biginteger "1")
+    :parse-fn parse-int
     :validate [#(> % 0)          "The number of files must be a positive integer."]]
+   ["-t" "--step-size NUM_FILES" "The size of the steps in how many files are concurrently read."
+    :default  8
+    :parse-fn parse-int
+    :validate [#(> % 0)          "The step size must be positive, lest we do nothing for a really long time."]]
    ["-b" "--benchmarks (read-throughput|write-throughput|write-type)"
     "Which of the available benchmarks to run. Separate by comma if multiple."
     :default  [:write-throughput :write-type :read-throughput]
