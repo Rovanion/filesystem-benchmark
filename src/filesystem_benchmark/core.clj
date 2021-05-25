@@ -74,13 +74,15 @@
                 (+throughput (time-dict (write-file-chunked-mmap data folder nr-chunks)) size)))])))
 
 (defn run-write-throughput-benchmark!
-  "Runs a write throughput benchmark with a default file size of
-  32MB and default max copies of 1024."
-  ([folder]           (run-write-throughput-benchmark! folder (math/expt 2 25)))
-  ([folder file-size] (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
-  ([folder file-size concurrency]
+  "Runs a write throughput benchmark with a default file size of 32MB,
+  a maximum number of concurrent files of 1024 and a file step size of
+  8."
+  ([folder]                     (run-write-throughput-benchmark! folder (math/expt 2 25)))
+  ([folder file-size]           (run-write-throughput-benchmark! folder file-size (math/expt 2 10)))
+  ([folder file-size max-files] (run-write-throughput-benchmark! folder file-size max-files 8))
+  ([folder file-size max-files step-size]
    (let [data (byte-array file-size)]
-     (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc concurrency))))]
+     (for [nr-concurrent-files (range step-size max-files step-size)]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
            (+throughput (* file-size nr-concurrent-files))
            (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
@@ -104,25 +106,26 @@
         (str "read-mmap-" nr-files))))
 
 (defn run-read-throughput-benchmark!
-  "Runs a read throughput benchmark with a default file size of 32MB
-  and default max copies of 1024."
-  ([folder]           (run-read-throughput-benchmark! folder (math/expt 2 25)))
-  ([folder file-size] (run-read-throughput-benchmark! folder file-size (math/expt 2 10)))
-  ([folder file-size concurrency]
-   (for [nr-concurrent-files (map #(math/expt 2 %) (range 0 (log2 (inc concurrency))))]
+  "Runs a read throughput benchmark with a default file size of 32MB,
+  a maximum of concurrent files of 1024 and a step size of 8."
+  ([folder]                     (run-read-throughput-benchmark! folder (math/expt 2 25)))
+  ([folder file-size]           (run-read-throughput-benchmark! folder file-size (math/expt 2 10)))
+  ([folder file-size max-files] (run-read-throughput-benchmark! folder file-size 8))
+  ([folder file-size max-files step-size]
+   (for [nr-concurrent-files (range step-size max-files step-size)]
      (do (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3")
          (-> (time-dict (read-file-copies-mmap folder nr-concurrent-files file-size))
              (+throughput (* file-size nr-concurrent-files))
              (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
 
 (defn -bench-out
-  [path file-size-mb concurrency name data]
-  (spit (str path "/" name file-size-mb "MB-" concurrency "copies-" (now) ".edn") (pps data)))
+  [path file-size-mb max-files name data]
+  (spit (str path "/" name file-size-mb "MB-" max-files "copies-" (now) ".edn") (pps data)))
 
 (defn run-benchmark
-  [{:keys [path file-size concurrency benchmarks]}]
+  [{:keys [path file-size max-files benchmarks step-size]}]
   (let [file-size-mb    (/ file-size (math/expt 2 20))
-        out             (partial -bench-out path file-size-mb concurrency)
+        out             (partial -bench-out path file-size-mb max-files)
         data-files-path (str path "/data-files/")]
     (io/make-parents (str data-files-path "dummy"))
     (when (in? benchmarks :write-type)
@@ -130,10 +133,10 @@
       (out "write-type-output-" (run-write-type-benchmark!       data-files-path file-size)))
     (when (in? benchmarks :write-throughput)
       (println "Starting write throughput benchmark.")
-      (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size concurrency)))
+      (out "write-throughput-"  (run-write-throughput-benchmark! data-files-path file-size max-files step-size)))
     (when (in? benchmarks :read-throughput)
       (println "Starting read throughput benchmark.")
-      (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size concurrency)))))
+      (out "read-throughput-"   (run-read-throughput-benchmark!  data-files-path file-size max-files step-size)))))
 
 
 (defn -main
