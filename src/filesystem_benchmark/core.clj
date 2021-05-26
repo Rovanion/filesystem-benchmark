@@ -82,7 +82,7 @@
   ([folder file-size max-files] (run-write-throughput-benchmark! folder file-size max-files 8))
   ([folder file-size max-files step-size]
    (let [data (byte-array file-size)]
-     (for [nr-concurrent-files (range step-size max-files step-size)]
+     (for [nr-concurrent-files (range step-size (inc max-files) step-size)]
        (-> (time-dict (write-file-copies-mmap data folder nr-concurrent-files))
            (+throughput (* file-size nr-concurrent-files))
            (assoc :total-MB (* (/ file-size (math/expt 2 20)) nr-concurrent-files)))))))
@@ -112,7 +112,7 @@
   ([folder file-size]           (run-read-throughput-benchmark! folder file-size (math/expt 2 10)))
   ([folder file-size max-files] (run-read-throughput-benchmark! folder file-size 8))
   ([folder file-size max-files step-size]
-   (for [nr-concurrent-files (range step-size max-files step-size)]
+   (for [nr-concurrent-files (range step-size (inc max-files) step-size)]
      (do (sh "sudo" "/sbin/sysctl" "vm.drop_caches=3")
          (-> (time-dict (read-file-copies-mmap folder nr-concurrent-files file-size))
              (+throughput (* file-size nr-concurrent-files))
