@@ -32,12 +32,7 @@ java -jar target/uberjar/filesystem-benchmark-<VERSION>-standalone.jar --help
 
 ## Options
 
-```
-  -p, --path PATH                                                 Path to the file system being tested.
-  -s, --file-size NUM_BYTES                                       Size of the files to be generated in bytes.
-  -c, --concurrency NUM_FILES                                     The number of files to write concurrently.
-  -b, --benchmarks (read-throughput|write-throughput|write-type)  Which of the available benchmarks to run. Separate by comma if multiple.
-```
+See --help output.
 
 ## Examples
 
