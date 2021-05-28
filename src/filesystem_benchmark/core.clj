@@ -4,9 +4,9 @@
             [clojure.math.numeric-tower     :as math]
             [clj-mmap.core                  :as mmap]
             [filesystem-benchmark.arguments :refer [validate-args]]
-            [filesystem-benchmark.utilities :refer [time-dict now pps log2 pooled-future in?]])
+            [filesystem-benchmark.utilities :refer [time-dict now pps log2 in?]]
+            [filesystem-benchmark.thread-pool :refer [pooled-future start-thread-pool]])
   (:gen-class))
-
 
 (defn write-file-output-stream
   [data base-path]
@@ -123,7 +123,9 @@
   (spit (str path "/" name file-size-mb "MB-" max-files "copies-" (now) ".edn") (pps data)))
 
 (defn run-benchmark
-  [{:keys [path file-size max-files benchmarks step-size]}]
+  "The imperative shell. Not that there is a functional core really, but one can dream."
+  [{:keys [path file-size max-files benchmarks step-size threads]}]
+  (start-thread-pool threads)
   (let [file-size-mb    (/ file-size (math/expt 2 20))
         out             (partial -bench-out path file-size-mb max-files)
         data-files-path (str path "/data-files/")]
