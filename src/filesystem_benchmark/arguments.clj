@@ -17,7 +17,7 @@
     :parse-fn io/file
     :validate [#(.exists %)      "Path must exist."
                #(.isDirectory %) "Path must be a directory."]]
-   ["-s" "--file-size NUM_BYTES" "Size of the files to be generated in bytes."
+   ["-f" "--file-size NUM_BYTES" "Size of the files to be generated in bytes."
     :default  (math/expt 2 22)
     :parse-fn parse-int
     :validate [#(> % 0)          "Size must be a positive integer."]]
@@ -25,12 +25,16 @@
     :default  (math/expt 2 10)
     :parse-fn parse-int
     :validate [#(> % 0)          "The number of files must be a positive integer."]]
-   ["-t" "--step-size NUM_FILES" "The size of the steps in how many files are concurrently read."
+   ["-s" "--step-size NUM_FILES" "The size of the steps in how many files are concurrently read."
     :default  8
     :parse-fn parse-int
-    :validate [#(> % 0)          "The step size must be positive, lest we do nothing for a really long time."]]
+    :validate [#(> % 0)          "The step size must be at least 1, lest we do nothing for a really long time."]]
+   ["-t" "--threads NUM_THREADS" "Number of threads reading or writing files in parallel."
+    :default (.availableProcessors (Runtime/getRuntime))
+    :parse-fn parse-int
+    :validate [#(> % 0)          "The number of threads must be at least 1."]]
    ["-b" "--benchmarks (read-throughput|write-throughput|write-type)"
-    "Which of the available benchmarks to run. Separate by comma if multiple."
+    "Which of the available benchmarks to run. Separate by comma if multiple like write-throughput,read-throughput."
     :default  [:write-throughput :write-type :read-throughput]
     :parse-fn (fn [benchmarks]
                 (as-> benchmarks b
