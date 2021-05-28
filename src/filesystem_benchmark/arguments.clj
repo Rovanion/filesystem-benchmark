@@ -57,7 +57,7 @@
   [args]
   (let [{:keys [options arguments errors summary]} (cli/parse-opts args cli-options)]
     (cond
-      (:help options) {:exit-message summary :ok? true}  ; help => exit 0 with usage summary.
-      errors          {:exit-message errors}             ; errors => exit 1 with description of errors.
+      (:help options)         {:exit-message summary :ok? true}  ; help => exit 0 with usage summary.
+      errors                  {:exit-message errors}             ; errors => exit 1 with description of errors.
       (not (empty arguments)) {:exit-message "This program takes no positional arguments."}
-      :else           {:options      options})))
+      :else                   {:options      options})))
